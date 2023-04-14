@@ -48,6 +48,8 @@ binary_sensor:
     name: "Push Button"
     lambda: |-
       return ((RTL433*) id(rtl_433))->matches(568150, "0x1 (Lock)");
+    filters: 
+      - delayed_off: 300ms
 
   - platform: template
     name: "Office-Door Open"
