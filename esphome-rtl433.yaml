@@ -11,6 +11,7 @@ esphome:
   platformio_options:
     lib_ldf_mode: chain+
 
+    # Configuration build flags for the Heltec WiFi LoRa 32 v2 device
     build_flags:
       - "-D RF_SX1278=1"
       - "-D RF_MODULE_DIO0=26"
@@ -48,7 +49,7 @@ binary_sensor:
     lambda: |-
       return ((RTL433*) id(rtl_433))->matches(568150, "0x1 (Lock)");
 
-  - platform: template 
+  - platform: template
     name: "Office-Door Open"
     internal: yes
     lambda: |-

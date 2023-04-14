@@ -4,6 +4,7 @@
 #include "SPI.h"
 #include "esphome.h"
 
+// There's probably a better way around this, but this seems to work okay...
 #undef yield
 #undef delay
 #undef delayMicroseconds
@@ -28,7 +29,7 @@ public:
   }
 
   void loop() override { 
-    rf.loop(); 
+    rf.loop();
   }
 
   bool matches(int id, char *data) {
@@ -53,8 +54,9 @@ private:
     _data = doc["data"];
     _cmd = doc["cmd"];
 
-    // I find that it's common to receive multiple signals from a device, with the last one not always being correct. 
-    // The delay helps mitigate this by leaving enough time for each signals to be processed
+    // I find that it's common to receive multiple signals from a device, with
+    // the last one not always being correct. The delay helps mitigate this by
+    // leaving enough time for each signals to be processed
     esphome::delay(50);
   }
 };
