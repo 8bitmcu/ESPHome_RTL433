@@ -1,0 +1,72 @@
+esphome:
+  name: esphome-rtl433
+
+  includes:
+    - rtl433.h
+  libraries:
+    - "SPI"
+    - "ArduinoJson"
+    - "https://github.com/NorthernMan54/rtl_433_ESP"
+
+  platformio_options:
+    lib_ldf_mode: chain+
+
+    build_flags:
+      - "-D RF_SX1278=1"
+      - "-D RF_MODULE_DIO0=26"
+      - "-D RF_MODULE_DIO1=35"
+      - "-D RF_MODULE_DIO2=34"
+      - "-D RF_MODULE_RST=14"
+      - "-D RF_MODULE_CS=18"
+      - "-D RF_MODULE_MOSI=27"
+      - "-D RF_MODULE_MISO=19"
+      - "-D RF_MODULE_SCK=5"
+
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+logger:
+  level: DEBUG
+
+api:
+
+custom_component:
+  - lambda: |-
+      auto rtl_433 = new RTL433();
+      App.register_component(rtl_433);
+      return {rtl_433};
+    components:
+      - id: rtl_433
+
+binary_sensor:
+  - platform: template
+    name: "Push Button"
+    lambda: |-
+      return ((RTL433*) id(rtl_433))->matches(568150, "0x1 (Lock)");
+
+  - platform: template 
+    name: "Office-Door Open"
+    internal: yes
+    lambda: |-
+      return ((RTL433*) id(rtl_433))->matches(49198, 10);
+    on_press:
+      - binary_sensor.template.publish:
+          id: office_door
+          state: ON
+  - platform: template
+    name: "Office-Door Closed"
+    internal: yes
+    lambda: |-
+      return ((RTL433*) id(rtl_433))->matches(49198, 14);
+    on_press:
+      - binary_sensor.template.publish:
+          id: office_door
+          state: OFF
+  - platform: template
+    name: "Office-Door"
+    device_class: door
+    id: office_door
